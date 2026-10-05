@@ -33,7 +33,7 @@ if (mode === '--source') {
   const raw = leader?.genvm_result?.stderr || leader?.result;
   const decoded = typeof raw !== 'string' ? '' : (/^[A-Za-z0-9+/]*={0,2}$/.test(raw) && raw.length % 4 === 0
     ? Buffer.from(raw, 'base64').toString('utf8') : raw);
-  console.log(JSON.stringify({hash: value, status: tx.status, execution: leader?.execution_result, consensus: tx.result_name,
+  console.log(JSON.stringify({hash: value, address: tx.to_address ?? tx.to, status: tx.status, execution: leader?.execution_result, consensus: tx.result_name,
     ...(mode === '--error' ? {decoded_error: decoded} : {})}));
   if (tx.status !== 'FINALIZED' || leader?.execution_result !== (mode === '--error' ? 'ERROR' : 'SUCCESS')) process.exitCode = 1;
   if (expectedError && !decoded.includes(expectedError)) process.exitCode = 1;

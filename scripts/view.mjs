@@ -7,5 +7,11 @@ if (!/^0x[0-9a-fA-F]{40}$/.test(address ?? '') || !functionName) throw Error('Ad
 const args = JSON.parse(rawArgs);
 if (!Array.isArray(args)) throw Error('JSON array required');
 const client = createClient({chain: studionet});
-console.log(JSON.stringify(await client.readContract({address, functionName, args}), (_, value) =>
-  typeof value === 'bigint' ? value.toString() : value));
+try {
+  console.log(JSON.stringify(await client.readContract({address, functionName, args}), (_, value) =>
+    typeof value === 'bigint' ? value.toString() : value));
+} catch (error) {
+  // RPC error receipts may contain unrelated validator configuration. Never dump them.
+  console.error(JSON.stringify({error: error.shortMessage ?? 'Read failed', code: error.code}));
+  process.exitCode = 1;
+}
